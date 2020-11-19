@@ -9,8 +9,25 @@
 	<artifactId>apigw-pkcs11-provider</artifactId>
 	<version>0.1-SNAPSHOT</version>
 
-	<name>apigw-pkcs11-provider</name>
-	<url>http://www.example.com</url>
+	<name>Axway API-GW PKCS11 provider</name>
+	<description>Makes the API-Gateway Certificate store available through an PKCS#11 provider.</description>
+	<url>https://github.com/Axway-API-Management-Plus/apigw-pkcs11-provider</url>
+	
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	
+	<developers>
+		<developer>
+			<name>Chris Wiechmann</name>
+			<email>cwiechmann@axway.com</email>
+			<organization>Axway</organization>
+			<organizationUrl>http://www.axway.com</organizationUrl>
+		</developer>
+	</developers>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,6 +35,13 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<apigateway.version>7.7.0.20200730-2</apigateway.version>
 	</properties>
+	
+	<scm>
+		<connection>scm:git:https://github.com/Axway-API-Management-Plus/apigw-pkcs11-provider.git</connection>
+		<developerConnection>scm:git:https://github.com/Axway-API-Management-Plus/apigw-pkcs11-provider.git</developerConnection>
+		<url>https://github.com/Axway-API-Management-Plus/apigw-pkcs11-provider</url>
+		<tag>0.1</tag>
+	</scm>
 
 	<repositories>
 		<repository>
