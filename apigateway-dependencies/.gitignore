@@ -1,2 +1,2 @@
 # Don't include JARs from the local Maven-Repo files
-!*.jar
+*.jar
