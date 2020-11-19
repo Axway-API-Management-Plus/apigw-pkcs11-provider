@@ -64,7 +64,7 @@ This project solves the problem by making the already initialized keystore avail
 
 - Download the latest release and extract it
 - Configure the additional Security-Provider: `com.axway.security.APIGatewayHSMPKCS11Provider` in `system/conf/jvm.xml` as shown in the example below: 
-```
+```xml
 <SecurityProvider index="1" name="sun.security.provider.Sun"/>
 <SecurityProvider index="2" name="sun.security.rsa.SunRsaSign"/>
 <SecurityProvider index="3" name="com.vordel.security.openssl.OSSLProvider"/>
