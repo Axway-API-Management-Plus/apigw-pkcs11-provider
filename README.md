@@ -62,7 +62,8 @@ This project solves the problem by making the already initialized keystore avail
 
 ## Installation
 
-- Download the latest release and extract it
+- Download the latest release (single JAR-File (e.g. `apigw-pkcs11-provider-0.1.jar`)
+- Copy the JAR-File into the `lib/ext` folder of your API-Gateway
 - Configure the additional Security-Provider: `com.axway.security.APIGatewayHSMPKCS11Provider` in `system/conf/jvm.xml` as shown in the example below: 
 ```xml
 <SecurityProvider index="1" name="sun.security.provider.Sun"/>
