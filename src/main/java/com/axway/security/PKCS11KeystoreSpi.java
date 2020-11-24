@@ -39,6 +39,13 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 		Key key = CertStore.getPrivateKey(certEntity, null);
 		return key;
 	}
+	
+	@Override
+	public void engineLoad(InputStream stream, char[] password)
+			throws IOException, NoSuchAlgorithmException, CertificateException {
+		// Do nothing, as the internal CertStore is already initialized
+		return;
+	}
 
 	@Override
 	public Certificate[] engineGetCertificateChain(String alias) {
@@ -111,11 +118,4 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 			throws IOException, NoSuchAlgorithmException, CertificateException {
 		throw new UnsupportedOperationException("Method 'engineStore(OutputStream stream, char[] password)' is not supported by the PKCS#11 keystore.");
 	}
-
-	@Override
-	public void engineLoad(InputStream stream, char[] password)
-			throws IOException, NoSuchAlgorithmException, CertificateException {
-		throw new UnsupportedOperationException("Method 'engineLoad(InputStream stream, char[] password)' is not supported by the PKCS#11 keystore.");
-	}
-
 }
