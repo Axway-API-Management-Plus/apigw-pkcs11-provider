@@ -5,7 +5,7 @@
 
 	<groupId>com.axway.security</groupId>
 	<artifactId>apigw-pkcs11-provider</artifactId>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.2-SNAPSHOT</version>
 
 	<name>Axway API-GW PKCS11 provider</name>
 	<description>Makes the API-Gateway Certificate store available through an PKCS#11 provider.</description>
