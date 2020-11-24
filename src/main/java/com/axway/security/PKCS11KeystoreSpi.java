@@ -46,15 +46,28 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 		// Do nothing, as the internal CertStore is already initialized
 		return;
 	}
-
+	
 	@Override
-	public Certificate[] engineGetCertificateChain(String alias) {
-		throw new UnsupportedOperationException("Method 'engineGetCertificateChain(String alias)' is not supported by the PKCS#11 keystore. Alias: " + alias);
+	public boolean engineContainsAlias(String alias) {
+		if(CertStore.getInstance().getPersonalInfoByAlias(alias)==null) {
+			System.out.println("engineContainsAlias - alias: '"+alias+"' is unknown");
+			return false;
+		} else {
+			System.out.println("engineContainsAlias - alias: '"+alias+"' found");
+			return true;
+		}
+	}
+	
+	@Override
+	public Certificate engineGetCertificate(String alias) {
+		System.out.println("engineGetCertificate - return certificate for alias: '"+alias+"'");
+		return CertStore.getInstance().getPersonalInfoByAlias(alias).certificate;
 	}
 
 	@Override
-	public Certificate engineGetCertificate(String alias) {
-		throw new UnsupportedOperationException("Method 'engineGetCertificate(String alias)' is not supported by the PKCS#11 keystore. Alias: " + alias);
+	public Certificate[] engineGetCertificateChain(String alias) {
+		System.out.println("engineGetCertificate - return certificate chain for alias: '"+alias+"'");
+		return CertStore.getInstance().getPersonalInfoByAlias(alias).chain;
 	}
 
 	@Override
@@ -86,11 +99,6 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 	@Override
 	public Enumeration<String> engineAliases() {
 		throw new UnsupportedOperationException("Method 'engineAliases()' is not supported by the PKCS#11 keystore.");
-	}
-
-	@Override
-	public boolean engineContainsAlias(String alias) {
-		throw new UnsupportedOperationException("Method 'engineContainsAlias(String alias)' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
