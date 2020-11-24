@@ -42,78 +42,80 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 
 	@Override
 	public Certificate[] engineGetCertificateChain(String alias) {
-		return null;
+		throw new UnsupportedOperationException("Method 'engineGetCertificateChain(String alias)' is not supported by the PKCS#11 keystore. Alias: " + alias);
 	}
 
 	@Override
 	public Certificate engineGetCertificate(String alias) {
-		return null;
+		throw new UnsupportedOperationException("Method 'engineGetCertificate(String alias)' is not supported by the PKCS#11 keystore. Alias: " + alias);
 	}
 
 	@Override
 	public Date engineGetCreationDate(String alias) {
-		return null;
+		throw new UnsupportedOperationException("Method 'engineGetCreationDate(String alias)' is not supported by the PKCS#11 keystore. Alias: " + alias);
 	}
 
 	@Override
 	public void engineSetKeyEntry(String alias, Key key, char[] password, Certificate[] chain)
 			throws KeyStoreException {
-
+		throw new UnsupportedOperationException("Method 'engineSetKeyEntry(String alias, Key key, char[] password, Certificate[] chain)' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
 	public void engineSetKeyEntry(String alias, byte[] key, Certificate[] chain) throws KeyStoreException {
-
+		throw new UnsupportedOperationException("Method 'engineSetKeyEntry(String alias, byte[] key, Certificate[] chain)' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
 	public void engineSetCertificateEntry(String alias, Certificate cert) throws KeyStoreException {
+		throw new UnsupportedOperationException("Method 'engineSetCertificateEntry(String alias, Certificate cert)' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
 	public void engineDeleteEntry(String alias) throws KeyStoreException {
+		throw new UnsupportedOperationException("Method 'engineDeleteEntry(String alias)' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
 	public Enumeration<String> engineAliases() {
-		return null;
+		throw new UnsupportedOperationException("Method 'engineAliases()' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
 	public boolean engineContainsAlias(String alias) {
-		return false;
+		throw new UnsupportedOperationException("Method 'engineContainsAlias(String alias)' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
 	public int engineSize() {
-		return 0;
+		throw new UnsupportedOperationException("Method 'engineSize()' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
 	public boolean engineIsKeyEntry(String alias) {
-		return false;
+		throw new UnsupportedOperationException("Method 'engineIsKeyEntry(String alias)' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
 	public boolean engineIsCertificateEntry(String alias) {
-		return false;
+		throw new UnsupportedOperationException("Method 'engineIsKeyEntry(String alias)' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
 	public String engineGetCertificateAlias(Certificate cert) {
-		return null;
+		throw new UnsupportedOperationException("Method 'engineGetCertificateAlias(Certificate cert)' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
 	public void engineStore(OutputStream stream, char[] password)
 			throws IOException, NoSuchAlgorithmException, CertificateException {
-
+		throw new UnsupportedOperationException("Method 'engineStore(OutputStream stream, char[] password)' is not supported by the PKCS#11 keystore.");
 	}
 
 	@Override
 	public void engineLoad(InputStream stream, char[] password)
 			throws IOException, NoSuchAlgorithmException, CertificateException {
-
+		throw new UnsupportedOperationException("Method 'engineLoad(InputStream stream, char[] password)' is not supported by the PKCS#11 keystore.");
 	}
 
 }
