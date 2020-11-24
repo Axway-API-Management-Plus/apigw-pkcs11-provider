@@ -61,18 +61,41 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 	@Override
 	public Certificate engineGetCertificate(String alias) {
 		System.out.println("engineGetCertificate - return certificate for alias: '"+alias+"'");
-		return CertStore.getInstance().getPersonalInfoByAlias(alias).certificate;
+		//return CertStore.getInstance().getPersonalInfoByAlias(alias).certificate;
+		try {
+			return CertStore.getInstance().getKeyStore().getCertificate(alias);
+		} catch (KeyStoreException e) {
+			throw new RuntimeException("Error getting certificate for alias: '"+alias+"' from underlying CertStore.keystore", e);
+		}
 	}
 
 	@Override
 	public Certificate[] engineGetCertificateChain(String alias) {
 		System.out.println("engineGetCertificate - return certificate chain for alias: '"+alias+"'");
-		return CertStore.getInstance().getPersonalInfoByAlias(alias).chain;
+		//return CertStore.getInstance().getPersonalInfoByAlias(alias).chain;
+		try {
+			return CertStore.getInstance().getKeyStore().getCertificateChain(alias);
+		} catch (KeyStoreException e) {
+			throw new RuntimeException("Error getting certificate chain for alias: '"+alias+"'  from underlying CertStore.keystore", e);
+		}
+	}
+	
+	@Override
+	public Enumeration<String> engineAliases() {
+		try {
+			return CertStore.getInstance().getKeyStore().aliases();
+		} catch (KeyStoreException e) {
+			throw new RuntimeException("Error getting aliases from underlying CertStore.keystore", e);
+		}
 	}
 
 	@Override
 	public Date engineGetCreationDate(String alias) {
-		throw new UnsupportedOperationException("Method 'engineGetCreationDate(String alias)' is not supported by the PKCS#11 keystore. Alias: " + alias);
+		try {
+			return CertStore.getInstance().getKeyStore().getCreationDate(alias);
+		} catch (KeyStoreException e) {
+			throw new RuntimeException("Error getting creation date for alias: '"+alias+"' from underlying CertStore.keystore", e);
+		}
 	}
 
 	@Override
@@ -97,28 +120,39 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 	}
 
 	@Override
-	public Enumeration<String> engineAliases() {
-		throw new UnsupportedOperationException("Method 'engineAliases()' is not supported by the PKCS#11 keystore.");
-	}
-
-	@Override
 	public int engineSize() {
-		throw new UnsupportedOperationException("Method 'engineSize()' is not supported by the PKCS#11 keystore.");
+		try {
+			return CertStore.getInstance().getKeyStore().size();
+		} catch (KeyStoreException e) {
+			throw new RuntimeException("Error getting size from underlying CertStore.keystore", e);
+		}
 	}
 
 	@Override
 	public boolean engineIsKeyEntry(String alias) {
-		throw new UnsupportedOperationException("Method 'engineIsKeyEntry(String alias)' is not supported by the PKCS#11 keystore.");
+		try {
+			return CertStore.getInstance().getKeyStore().isKeyEntry(alias);
+		} catch (KeyStoreException e) {
+			throw new RuntimeException("Error when calling IsKeyEntry for alias: '"+alias+"' on underlying CertStore.keystore", e);
+		}
 	}
 
 	@Override
 	public boolean engineIsCertificateEntry(String alias) {
-		throw new UnsupportedOperationException("Method 'engineIsKeyEntry(String alias)' is not supported by the PKCS#11 keystore.");
+		try {
+			return CertStore.getInstance().getKeyStore().isCertificateEntry(alias);
+		} catch (KeyStoreException e) {
+			throw new RuntimeException("Error when calling IsCertificateEntry for alias: '"+alias+"' on underlying CertStore.keystore", e);
+		}
 	}
 
 	@Override
 	public String engineGetCertificateAlias(Certificate cert) {
-		throw new UnsupportedOperationException("Method 'engineGetCertificateAlias(Certificate cert)' is not supported by the PKCS#11 keystore.");
+		try {
+			return CertStore.getInstance().getKeyStore().getCertificateAlias(cert);
+		} catch (KeyStoreException e) {
+			throw new RuntimeException("Error when calling getCertificateAlias for certificate: '"+cert+"' on underlying CertStore.keystore", e);
+		}
 	}
 
 	@Override
