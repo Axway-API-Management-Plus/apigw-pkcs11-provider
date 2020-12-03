@@ -9,11 +9,17 @@ import java.security.KeyStoreSpi;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Enumeration;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import com.vordel.store.cert.CertStore;
+import com.vordel.trace.Trace;
 
 /**
  * This class implements the java.lang.Keystore and forwards requests to the internal API gateway CertStore, which is already initialized.
@@ -22,6 +28,8 @@ import com.vordel.store.cert.CertStore;
  *
  */
 public class PKCS11KeystoreSpi extends KeyStoreSpi {
+	
+	String intend = "                ";
 
 	public PKCS11KeystoreSpi() {
 	}
@@ -35,8 +43,13 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 		CertEntity certEntity = new CertEntity();
 		certEntity.setStoreType("HSM");
 		certEntity.setCertificateRealm(alias);
-		System.out.println("Requesting key from API-Gateway certificate store: " + certEntity);
+		Trace.info("engineGetKey: Requesting key from API-Gateway certificate store (HSM): " + certEntity);
 		Key key = CertStore.getPrivateKey(certEntity, null);
+		if(key!=null) {
+			Trace.info(intend+"engineGetKey: Got key from HSM for alias: " + alias);	
+		} else {
+			Trace.error(intend+"engineGetKey: No private key found for alias: " + alias);
+		}
 		return key;
 	}
 	
@@ -50,33 +63,54 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 	@Override
 	public boolean engineContainsAlias(String alias) {
 		if(CertStore.getInstance().getPersonalInfoByAlias(alias)==null) {
-			System.out.println("engineContainsAlias - alias: '"+alias+"' is unknown");
+			Trace.info("engineContainsAlias - alias: '"+alias+"' is unknown");
 			return false;
 		} else {
-			System.out.println("engineContainsAlias - alias: '"+alias+"' found");
+			Trace.info("engineContainsAlias - alias: '"+alias+"' found");
 			return true;
 		}
 	}
 	
 	@Override
 	public Certificate engineGetCertificate(String alias) {
-		System.out.println("engineGetCertificate - return certificate for alias: '"+alias+"'");
-		//return CertStore.getInstance().getPersonalInfoByAlias(alias).certificate;
+		return engineGetCertificate(alias, true);
+	}
+	
+	public Certificate engineGetCertificate(String alias, boolean traceCertificate) {
+		Trace.trace("engineGetCertificate - return certificate for alias: '"+alias+"'", Trace.TRACE_DATA);
 		try {
-			return CertStore.getInstance().getKeyStore().getCertificate(alias);
+			Certificate cert = CertStore.getInstance().getKeyStore().getCertificate(alias);
+			if(cert!=null) {
+				Trace.info(intend+"engineGetCertificate - return certificate for alias: '"+alias+"'");
+				if(traceCertificate) traceCertificate(cert);
+			} else {
+				Trace.error(intend+"engineGetCertificate - no certificate found for alias: "+alias);
+			}
+			return cert;
 		} catch (KeyStoreException e) {
 			throw new RuntimeException("Error getting certificate for alias: '"+alias+"' from underlying CertStore.keystore", e);
 		}
 	}
-
+	
 	@Override
 	public Certificate[] engineGetCertificateChain(String alias) {
-		System.out.println("engineGetCertificate - return certificate chain for alias: '"+alias+"'");
-		//return CertStore.getInstance().getPersonalInfoByAlias(alias).chain;
-		try {
-			return CertStore.getInstance().getKeyStore().getCertificateChain(alias);
-		} catch (KeyStoreException e) {
-			throw new RuntimeException("Error getting certificate chain for alias: '"+alias+"'  from underlying CertStore.keystore", e);
+		Trace.info("engineGetCertificateChain - return certificate chain for alias: '"+alias+"'");
+		Certificate certificate = engineGetCertificate(alias, false);
+		if(certificate==null) {
+			Trace.info(intend+"engineGetCertificateChain - No certificate found with alias: '"+alias+"'");
+			return null;
+		}
+		Certificate[] chain = CertStore.getInstance().getX509CertificateChainAsArray((X509Certificate)certificate);
+		if(chain!=null) {
+			Trace.info(intend+"engineGetCertificateChain - return certificate chain for alias: '"+alias+"'. Got: " + chain.length + " certificate(s)");
+			for(Certificate cert : chain) {
+				Trace.info("------");
+				traceCertificate(cert);
+			}
+			return chain;
+		} else {
+			Trace.info(intend+"engineGetCertificateChain - No certificate chain found for alias: '"+alias+"'");
+			return null;
 		}
 	}
 	
@@ -159,5 +193,35 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 	public void engineStore(OutputStream stream, char[] password)
 			throws IOException, NoSuchAlgorithmException, CertificateException {
 		throw new UnsupportedOperationException("Method 'engineStore(OutputStream stream, char[] password)' is not supported by the PKCS#11 keystore.");
+	}
+	
+	private byte[] getCertEncoded(Certificate cert) {
+	      try {
+	        return cert.getEncoded();
+	      } catch (CertificateEncodingException e) {
+	    	  Trace.error("Error byte encodedo", e);
+	      }
+	      return null;
+	}
+
+	private String getHexString(byte[] bytes) {
+		char[] hex = Hex.encodeHex(bytes);
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < hex.length; i++) {
+			if (i % 2 == 0 && i > 0)
+				sb.append(':'); 
+			sb.append(Character.toUpperCase(hex[i]));
+		} 
+		return sb.toString();
+	}
+
+	private void traceCertificate(Certificate cert) {
+		if(cert!=null && cert instanceof X509Certificate) {
+			X509Certificate x509Cert = (X509Certificate)cert;
+			Trace.info(intend+"Cert issued to:   " + x509Cert.getSubjectDN().getName());
+			Trace.info(intend+"Cert issued by:   " + x509Cert.getIssuerDN().getName());
+			Trace.info(intend+"SHA1-Fingerprint: " + getHexString(DigestUtils.sha1(getCertEncoded(cert)) ) );
+			Trace.info(intend+"MD5-Fingerprint:  " + getHexString(DigestUtils.md5(getCertEncoded(cert)) ) );
+		}
 	}
 }

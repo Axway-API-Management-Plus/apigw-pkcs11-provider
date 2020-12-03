@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.vordel.es.Entity;
+import com.vordel.es.EntityStoreException;
 
 /**
  * Utility class that simulates an entity store to pass the necessary 
@@ -15,6 +16,8 @@ import com.vordel.es.Entity;
 public class CertEntity extends Entity {
 	
 	private Map<String, String> values = new HashMap<String, String>();
+	
+	private Map<String, byte[]> binaryValues = new HashMap<String, byte[]>();
 
 	public CertEntity() {
 		super(null);
@@ -30,12 +33,30 @@ public class CertEntity extends Entity {
 		return super.getStringValue(fieldName);
 	}
 
+	@Override
+	public byte[] getBinaryValue(String fieldName) throws EntityStoreException {
+		if(binaryValues.containsKey(fieldName)) {
+			return binaryValues.get(fieldName);
+		} else {
+			System.out.println("fieldName: " + fieldName + " not supported by CertEntity");
+		}
+		return super.getBinaryValue(fieldName);
+	}
+
 	public void setStoreType(String storeType) {
 		this.values.put("storeType", storeType);
 	}
 
 	public void setCertificateRealm(String certificateRealm) {
 		this.values.put("certificateRealm", certificateRealm);
+	}
+	
+	public void setKey(byte[] key) {
+		binaryValues.put("key", key);
+	}
+	
+	public void setKeyId(String key) {
+		values.put("keyId", key);
 	}
 
 	@Override
