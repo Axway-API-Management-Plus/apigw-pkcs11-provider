@@ -15,9 +15,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Enumeration;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-
+import com.vordel.common.util.DigestUtil;
 import com.vordel.store.cert.CertStore;
 import com.vordel.trace.Trace;
 
@@ -204,24 +202,13 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 	      return null;
 	}
 
-	private String getHexString(byte[] bytes) {
-		char[] hex = Hex.encodeHex(bytes);
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < hex.length; i++) {
-			if (i % 2 == 0 && i > 0)
-				sb.append(':'); 
-			sb.append(Character.toUpperCase(hex[i]));
-		} 
-		return sb.toString();
-	}
-
 	private void traceCertificate(Certificate cert) {
 		if(cert!=null && cert instanceof X509Certificate) {
 			X509Certificate x509Cert = (X509Certificate)cert;
 			Trace.info(intend+"Cert issued to:   " + x509Cert.getSubjectDN().getName());
 			Trace.info(intend+"Cert issued by:   " + x509Cert.getIssuerDN().getName());
-			Trace.info(intend+"SHA1-Fingerprint: " + getHexString(DigestUtils.sha1(getCertEncoded(cert)) ) );
-			Trace.info(intend+"MD5-Fingerprint:  " + getHexString(DigestUtils.md5(getCertEncoded(cert)) ) );
+			Trace.info(intend+"MD5-Fingerprint:  " + DigestUtil.getSHA1MessageDigest(getCertEncoded(cert)) );
+			Trace.info(intend+"MD5-Fingerprint:  " + DigestUtil.getMD5MessageDigest(getCertEncoded(cert)) );
 		}
 	}
 }
