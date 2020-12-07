@@ -41,7 +41,7 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 		CertEntity certEntity = new CertEntity();
 		certEntity.setStoreType("HSM");
 		certEntity.setCertificateRealm(alias);
-		Trace.info("engineGetKey: Requesting key from API-Gateway certificate store (HSM): " + certEntity);
+		Trace.info("engineGetKey: Trying get key from API-Gateway certificate store (HSM): " + certEntity);
 		Key key = CertStore.getPrivateKey(certEntity, null);
 		if(key!=null) {
 			Trace.info(intend+"engineGetKey: Got key from HSM for alias: " + alias);	
@@ -75,24 +75,20 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 	}
 	
 	public Certificate engineGetCertificate(String alias, boolean traceCertificate) {
-		Trace.trace("engineGetCertificate - return certificate for alias: '"+alias+"'", Trace.TRACE_DATA);
-		try {
-			Certificate cert = CertStore.getInstance().getKeyStore().getCertificate(alias);
-			if(cert!=null) {
-				Trace.info(intend+"engineGetCertificate - return certificate for alias: '"+alias+"'");
-				if(traceCertificate) traceCertificate(cert);
-			} else {
-				Trace.error(intend+"engineGetCertificate - no certificate found for alias: "+alias);
-			}
-			return cert;
-		} catch (KeyStoreException e) {
-			throw new RuntimeException("Error getting certificate for alias: '"+alias+"' from underlying CertStore.keystore", e);
+		Trace.trace("engineGetCertificate - Trying to get certificate for alias: '"+alias+"'", Trace.TRACE_DATA);
+		Certificate cert = CertStore.getInstance().getPersonalInfoByAlias(alias).certificate;
+		if(cert!=null) {
+			Trace.info(intend+"engineGetCertificate - Got certificate for alias: '"+alias+"'");
+			if(traceCertificate) traceCertificate(cert);
+		} else {
+			Trace.error(intend+"engineGetCertificate - no certificate found for alias: "+alias);
 		}
+		return cert;
 	}
 	
 	@Override
 	public Certificate[] engineGetCertificateChain(String alias) {
-		Trace.info("engineGetCertificateChain - return certificate chain for alias: '"+alias+"'");
+		Trace.info("engineGetCertificateChain - Trying to get certificate chain for alias: '"+alias+"'");
 		Certificate certificate = engineGetCertificate(alias, false);
 		if(certificate==null) {
 			Trace.info(intend+"engineGetCertificateChain - No certificate found with alias: '"+alias+"'");
@@ -100,7 +96,7 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 		}
 		Certificate[] chain = CertStore.getInstance().getX509CertificateChainAsArray((X509Certificate)certificate);
 		if(chain!=null) {
-			Trace.info(intend+"engineGetCertificateChain - return certificate chain for alias: '"+alias+"'. Got: " + chain.length + " certificate(s)");
+			Trace.info(intend+"engineGetCertificateChain - Got certificate chain for alias: '"+alias+"'. Got: " + chain.length + " certificate(s)");
 			for(Certificate cert : chain) {
 				Trace.info("------");
 				traceCertificate(cert);
