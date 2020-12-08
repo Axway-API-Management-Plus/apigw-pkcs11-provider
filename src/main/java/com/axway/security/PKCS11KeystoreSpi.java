@@ -77,7 +77,7 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 	
 	public Certificate engineGetCertificate(String alias, boolean traceCertificate) {
 		Certificate cert = null;
-		Trace.trace("engineGetCertificate - Trying to get certificate for alias: '"+alias+"'", Trace.TRACE_DATA);
+		Trace.info("engineGetCertificate - Trying to get certificate for alias: '"+alias+"'");
 		PersonalInfo persInfo = CertStore.getInstance().getPersonalInfoByAlias(alias);
 		if(persInfo!=null) {
 			Trace.info("engineGetCertificate - Got personalInfo by alias: '"+alias+"'");
