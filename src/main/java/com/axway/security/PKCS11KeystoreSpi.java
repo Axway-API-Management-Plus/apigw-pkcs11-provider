@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.Enumeration;
 
 import com.vordel.common.util.DigestUtil;
+import com.vordel.security.cert.PersonalInfo;
 import com.vordel.store.cert.CertStore;
 import com.vordel.trace.Trace;
 
@@ -75,8 +76,23 @@ public class PKCS11KeystoreSpi extends KeyStoreSpi {
 	}
 	
 	public Certificate engineGetCertificate(String alias, boolean traceCertificate) {
+		Certificate cert = null;
 		Trace.trace("engineGetCertificate - Trying to get certificate for alias: '"+alias+"'", Trace.TRACE_DATA);
-		Certificate cert = CertStore.getInstance().getPersonalInfoByAlias(alias).certificate;
+		PersonalInfo persInfo = CertStore.getInstance().getPersonalInfoByAlias(alias);
+		if(persInfo!=null) {
+			Trace.info("engineGetCertificate - Got personalInfo by alias: '"+alias+"'");
+			if(persInfo.certificate!=null) {
+				Trace.info("engineGetCertificate - Got certificate from personalInfo by alias: '"+alias+"'");
+				cert = persInfo.certificate;
+			}
+		} else {
+			try {
+				Trace.info("engineGetCertificate - No personalInfo found for: '"+alias+"'. Trying to use keystore: ....getKeyStore().getCertificate(alias).");
+				cert = CertStore.getInstance().getKeyStore().getCertificate(alias);
+			} catch (KeyStoreException e) {
+				Trace.error("Exception on getKeyStore().getCertificate(alias). " + e.getMessage(), e);
+			}
+		}
 		if(cert!=null) {
 			Trace.info(intend+"engineGetCertificate - Got certificate for alias: '"+alias+"'");
 			if(traceCertificate) traceCertificate(cert);
